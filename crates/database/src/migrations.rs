@@ -22,6 +22,7 @@ pub async fn run_migrations(pool: &PgPool) -> Result<()> {
             user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             name VARCHAR(255) NOT NULL,
             description TEXT,
+            category TEXT NOT NULL DEFAULT 'Other',
             base_url TEXT NOT NULL,
             endpoints JSONB NOT NULL DEFAULT '[]'::jsonb,
             payment_config JSONB,
@@ -38,6 +39,19 @@ pub async fn run_migrations(pool: &PgPool) -> Result<()> {
         .await?;
 
     sqlx::query("CREATE INDEX IF NOT EXISTS idx_apis_created_at ON apis(created_at)")
+        .execute(pool)
+        .await?;
+
+    sqlx::query(
+        r#"
+        ALTER TABLE apis 
+        ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT 'Other'
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    sqlx::query("CREATE INDEX IF NOT EXISTS idx_apis_category ON apis(category)")
         .execute(pool)
         .await?;
 
