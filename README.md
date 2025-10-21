@@ -17,3 +17,5 @@ Database models are in the [shared](https://github.com/shubhexists/enigma/blob/m
 ## Usage
 
 Although, server can be directly interacted with normal `reqwest` or `x402-reqwest`, but it is preferred to use the `enigma_api` crate we [published](https://github.com/shubhexists/enigma/tree/main/pkgs/rust), with the sample usage here (https://github.com/shubhexists/enigma/tree/main/example/rust) which is created just for interacted with Enigma.
+
+For typescript, use the typescript SDK of Enigma pubished [here](https://www.npmjs.com/package/@shubhexists/enigma), examples [here](https://github.com/shubhexists/enigma/tree/main/example/ts)
