@@ -9,7 +9,7 @@ pub struct UserRepository {
     pool: PgPool,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct ApiRepository {
     pool: PgPool,
 }

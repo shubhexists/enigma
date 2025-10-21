@@ -1,15 +1,19 @@
 use crate::facilitator_client::{FacilitatorClient, FacilitatorClientError};
 use crate::price::PriceTag;
+use axum::Json;
 use axum_core::body::Body;
 use axum_core::{
     extract::Request,
     response::{IntoResponse, Response},
 };
+use database::ApiRepository;
 use http::{HeaderMap, HeaderValue, StatusCode, Uri};
 use once_cell::sync::Lazy;
 use serde_json::json;
+use solana_sdk::pubkey::Pubkey;
 use std::collections::HashSet;
 use std::fmt::{Debug, Display};
+use std::str::FromStr;
 use std::sync::Arc;
 use std::{
     convert::Infallible,
@@ -20,7 +24,7 @@ use std::{
 use tower::util::BoxCloneSyncService;
 use tower::{Layer, Service};
 use url::Url;
-use x402_rs::address_sol;
+use uuid::Uuid;
 use x402_rs::facilitator::Facilitator;
 use x402_rs::network::Network;
 use x402_rs::types::{
@@ -40,6 +44,7 @@ pub struct X402Middleware<F> {
     max_timeout_seconds: u64,
     payment_offers: Arc<PaymentOffers>,
     api_id: Option<String>,
+    api_repo: Option<ApiRepository>,
 }
 
 impl TryFrom<&str> for X402Middleware<FacilitatorClient> {
@@ -74,6 +79,7 @@ where
             price_tag: Vec::new(),
             payment_offers: Arc::new(PaymentOffers::Ready(Arc::new(Vec::new()))),
             api_id: None,
+            api_repo: None,
         }
     }
 
@@ -142,6 +148,12 @@ where
     pub fn with_api_id(&self, api_id: String) -> Self {
         let mut this = self.clone();
         this.api_id = Some(api_id);
+        this
+    }
+
+    pub fn with_api_repo(&self, api_repo: ApiRepository) -> Self {
+        let mut this = self.clone();
+        this.api_repo = Some(api_repo);
         this
     }
 
@@ -225,6 +237,7 @@ pub struct X402MiddlewareService<F> {
     payment_offers: Arc<PaymentOffers>,
     inner: BoxCloneSyncService<Request, Response, Infallible>,
     api_id: Option<String>,
+    api_repo: Option<ApiRepository>,
 }
 
 impl<S, F> Layer<S> for X402Middleware<F>
@@ -242,6 +255,7 @@ where
             payment_offers: self.payment_offers.clone(),
             inner: BoxCloneSyncService::new(inner),
             api_id: self.api_id.clone(),
+            api_repo: self.api_repo.clone(),
         }
     }
 }
@@ -265,6 +279,7 @@ where
             facilitator: self.facilitator.clone(),
             payment_requirements,
             api_id: self.api_id.clone(),
+            api_repo: self.api_repo.clone(),
         };
         let inner = self.inner.clone();
         Box::pin(gate.call(inner, req))
@@ -357,6 +372,7 @@ pub struct X402Paygate<F> {
     pub facilitator: Arc<F>,
     pub payment_requirements: Arc<Vec<PaymentRequirements>>,
     pub api_id: Option<String>,
+    pub api_repo: Option<ApiRepository>,
 }
 
 impl<F> X402Paygate<F>
@@ -520,16 +536,40 @@ where
         S::Error: IntoResponse,
     {
         let api_id = req.extensions().get::<String>().cloned();
-        if let Some(_api_id) = api_id {
-            let pay_to = address_sol!("8hAVK73RZdtyP2kE82ohAsAGgKaxffS6pU7B9bxRg2RL");
-            let amount = TokenAmount::from(50000u64);
+        if let Some(api_id) = api_id {
+            let response = match self
+                .api_repo
+                .clone()
+                .unwrap()
+                .get_api_by_id(Uuid::from_str(&api_id).unwrap())
+                .await
+            {
+                Ok(Some(api)) => Ok(Json(api)),
+                Ok(None) => Err(StatusCode::NOT_FOUND),
+                Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
+            }
+            .unwrap();
+            let pay_to = response
+                .0
+                .payment_config
+                .as_ref()
+                .map(|c| c.sol_public_key.clone())
+                .unwrap_or_else(|| "8hAVK73RZdtyP2kE82ohAsAGgKaxffS6pU7B9bxRg2RL".to_string());
+            let amount = TokenAmount::from(
+                response
+                    .0
+                    .payment_config
+                    .as_ref()
+                    .map(|c| (c.cost_per_request * 1_000_000.0) as u64)
+                    .unwrap_or(50000u64),
+            );
 
             let updated_requirements = self
                 .payment_requirements
                 .iter()
                 .map(|req| {
                     let mut updated = req.clone();
-                    updated.pay_to = pay_to.clone();
+                    updated.pay_to = MixedAddress::Solana(Pubkey::from_str(&pay_to).unwrap());
                     updated.max_amount_required = amount;
                     updated
                 })

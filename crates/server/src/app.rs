@@ -57,7 +57,8 @@ pub fn create_app(pool: PgPool) -> Router {
                 .layer(
                     x402.with_description("Protected API Proxy")
                         .with_mime_type("application/json")
-                        .with_price_tag(usdc_solana.amount(0).unwrap()),
+                        .with_price_tag(usdc_solana.amount(0).unwrap())
+                        .with_api_repo(api_repo.clone()),
                 )
                 .layer(axum::middleware::from_fn(inject_api_id)),
         )
