@@ -8,7 +8,7 @@ Enigma currently just supports USDC, although soon would be expanding to more po
 
 ## Technical Overview 
 
-Enigma implements a custom [middleware](https://github.com/shubhexists/enigma/tree/main/crates/middleware), derived after making several changes to the `x402-axum` crate, which makes this peer to peer access possible.
+Enigma implements a custom [middleware](https://github.com/shubhexists/enigma/tree/main/crates/middleware) which is a safe implementation of x402 on Solana, derived after making several changes to the `x402-axum` crate, which makes this peer to peer access possible.
 
 Several of the server business logic resides in the [server](https://github.com/shubhexists/enigma/tree/main/crates/server) crate which exposes several APIs for Enigma.
 
