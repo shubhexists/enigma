@@ -1,3 +1,24 @@
-/target
-node_modules
-dist
+# Node.js
+node_modules/
+.next/
+out/
+dist/
+.pnpm-debug.log*
+
+# Rust
+target/
+**/*.rs.bk
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.iml
+.DS_Store
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
