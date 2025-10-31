@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="2660" height="588" viewBox="0 0 2660 588" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Enigma wordmark using the same gradient id as original -->
+  <defs>
+    <linearGradient id="paint0_linear_2004_2" x1="1593" y1="0" x2="1587.97" y2="712.251" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F2EDE6"/>
+      <stop offset="1" stop-color="#1F1D1D"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Centered text: adjust font-family/size/letter-spacing if needed -->
+  <text
+    x="1330.0"
+    y="294.0"
+    text-anchor="middle"
+    dominant-baseline="central"
+    fill="url(#paint0_linear_2004_2)"
+    font-family="Inter, Helvetica, Arial, sans-serif"
+    font-size="360"
+    letter-spacing="8"
+  >
+    Enigma
+  </text>
+</svg>

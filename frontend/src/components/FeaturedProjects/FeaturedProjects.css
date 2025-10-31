@@ -1,0 +1,114 @@
+.featured-projects {
+  padding: 120px 0;
+  background: var(--background);
+}
+
+.featured-projects__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.featured-projects__title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 80px;
+  color: var(--foreground);
+  font-family: var(--font-space-mono);
+}
+
+.featured-projects__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 40px;
+}
+
+.featured-projects__project {
+  background: var(--card);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+}
+
+.featured-projects__project:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.featured-projects__project-image {
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+}
+
+.featured-projects__project-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.featured-projects__project:hover .featured-projects__project-image img {
+  transform: scale(1.05);
+}
+
+.featured-projects__project-content {
+  padding: 24px;
+}
+
+.featured-projects__project-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--foreground);
+  font-family: var(--font-space-mono);
+}
+
+.featured-projects__project-description {
+  color: var(--muted-foreground);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.featured-projects__project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.featured-projects__project-tag {
+  background: var(--muted);
+  color: var(--muted-foreground);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: var(--font-space-mono);
+}
+
+@media (max-width: 768px) {
+  .featured-projects {
+    padding: 80px 0;
+  }
+
+  .featured-projects__container {
+    padding: 0 16px;
+  }
+
+  .featured-projects__title {
+    margin-bottom: 60px;
+  }
+
+  .featured-projects__grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .featured-projects__project-content {
+    padding: 20px;
+  }
+}
+
+
